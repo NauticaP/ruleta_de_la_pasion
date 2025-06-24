@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruleta de Pasión</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital@1&family=Roboto:wght@300&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background: radial-gradient(circle, #4a0e0e, #1a0000, #000000);
+            color: #f0e6e6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 25px rgba(255, 50, 50, 0.2);
+            border: 1px solid rgba(255, 100, 100, 0.2);
+            max-width: 90%;
+            width: 500px;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 3em;
+            color: #ff6b6b;
+            text-shadow: 0 0 10px #ff6b6b;
+            margin-bottom: 30px;
+        }
+        
+        #result-display {
+            background-color: rgba(10, 0, 0, 0.5);
+            border: 2px solid #ff6b6b;
+            border-radius: 15px;
+            min-height: 250px; /* Aumentamos un poco la altura para la imagen */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .result-icon {
+            height: 160px; /* Altura fija para el contenedor del icono/imagen */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            animation: fadeIn 0.5s;
+        }
+        
+        /* --- ESTILO PARA LAS IMÁGENES --- */
+        .result-icon img {
+            max-width: 100%;
+            max-height: 150px; /* La imagen no será más alta de 150px */
+            display: block;
+            object-fit: contain;
+        }
+
+        .result-text {
+            font-size: 1.5rem;
+            font-weight: 300;
+            color: #fff;
+            animation: fadeIn 0.5s;
+        }
+        
+        #spin-button {
+            font-family: 'Playfair Display', serif;
+            background: linear-gradient(145deg, #ff6b6b, #c53939);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.5em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
+        }
+
+        #spin-button:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(255, 107, 107, 0.8);
+        }
+
+        #spin-button:disabled {
+            background: #555;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Ruleta de Pasión</h1>
+        
+        <div id="result-display">
+            <div class="result-icon">😈</div>
+            <div class="result-text">Presiona "Girar" para empezar...</div>
+        </div>
+
+        <button id="spin-button">Girar</button>
+    </div>
+
+    <script>
+        // --- Lógica de la Ruleta ---
+
+        // 1. Opciones del juego con la ruta a tus imágenes
+        // ¡¡ASEGÚRATE DE QUE LOS NOMBRES DE ARCHIVO COINCIDAN EXACTAMENTE!!
+        const options = [
+            { image: "imagenes/cegar.png", text: "¡¡Véndame los ojos y hazme lo que quieras!!" },
+            { image: "imagenes/blowme.png", text: "¡Chúpame!" },
+            { image: "imagenes/juguete.png", text: "Saca un juguete... ¡Tu elección!" },
+            { image: "imagenes/cachorro.png", text: "En 4 y profundo" },
+            { image: "imagenes/comer.png", text: "¡Chúpame!" },
+            { image: "imagenes/pies.png", text: "¡Masaje con los pies!" },
+            { image: "imagenes/desnudo.png", text: "¡Desnudate!" },
+            { image: "imagenes/oral.png", text: "¡¡Un minuto de sexo oral!!" },
+            { image: "imagenes/beso.png", text: "¡¡Dame un beso profundo y apasionado!" },
+            { image: "imagenes/atame.png", text: "¡¡Átame de manos y pies y hazme lo que quieras!" },
+            { image: "imagenes/tetas.png", text: "¡Déjame ver y chupar tus tetas!" },
+            { image: "imagenes/golpeame.png", text: "¡Golpéalo, escúpelo y muérdelo!" },
+            { image: "imagenes/foto.png", text: "¡¡Tomame una foto sexy desnudo/a!" },
+            { image: "imagenes/no_labios.png", text: "Bésame (no en los labios)" },
+            { image: "imagenes/69.png", text: "¡Vamos 69!" },
+        ];
+
+        const spinButton = document.getElementById('spin-button');
+        const resultDisplay = document.getElementById('result-display');
+
+        function spin() {
+            spinButton.disabled = true;
+            spinButton.textContent = 'Girando...';
+
+            let spinInterval = setInterval(() => {
+                const randomOption = options[Math.floor(Math.random() * options.length)];
+                // Ahora creamos una etiqueta <img> para la imagen
+                resultDisplay.innerHTML = `
+                    <div class="result-icon"><img src="${randomOption.image}" alt="Icono de la acción"></div>
+                    <div class="result-text">${randomOption.text}</div>
+                `;
+            }, 75);
+
+            setTimeout(() => {
+                clearInterval(spinInterval);
+                const finalOption = options[Math.floor(Math.random() * options.length)];
+                resultDisplay.innerHTML = `
+                    <div class="result-icon"><img src="${finalOption.image}" alt="Icono de la acción"></div>
+                    <div class="result-text">${finalOption.text}</div>
+                `;
+                spinButton.disabled = false;
+                spinButton.textContent = 'Girar de Nuevo';
+            }, 3000);
+        }
+
+        spinButton.addEventListener('click', spin);
+    </script>
+
+</body>
+</html>
